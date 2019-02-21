@@ -29,7 +29,7 @@ function(input, output, session) {
     {
         click <- input$mymap_click
 
-        source("/srv/shiny-server/buhayra-app/pw.R")
+        source("/srv/shiny-server/buhayra-semiarido/pw.R")
         drv <- dbDriver("PostgreSQL")
         con <- dbConnect(drv, dbname='watermasks', host = hostname, port = 5432, user = "sar2water", password = pw)
         rm(pw)
