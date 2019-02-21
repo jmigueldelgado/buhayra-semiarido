@@ -31,7 +31,7 @@ function(input, output, session) {
 
         source("/srv/shiny-server/buhayra-app/pw.R")
         drv <- dbDriver("PostgreSQL")
-        con <- dbConnect(drv, dbname='watermasks', host = "localhost", port = 5432, user = "sar2water", password = pw)
+        con <- dbConnect(drv, dbname='watermasks', host = hostname, port = 5432, user = "sar2water", password = pw)
         rm(pw)
         ts <- dbGetQuery(con, paste0("SELECT jrc_neb.id_jrc, ST_area(ST_Transform(jrc_neb.geom,32724)) as ref_area,neb.area,neb.ingestion_time FROM jrc_neb RIGHT JOIN neb ON jrc_neb.id_jrc=neb.id_jrc WHERE ST_Contains(jrc_neb.geom, ST_SetSRID(ST_Point(",click$lng,",",click$lat,"),4326))"))
         dbDisconnect(conn = con)
