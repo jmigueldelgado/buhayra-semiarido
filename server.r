@@ -28,16 +28,18 @@ function(input, output, session) {
     observeEvent(input$mymap_click,
     {
         click <- input$mymap_click
-
         source("/srv/shiny-server/buhayra-semiarido/pw.R")
         drv <- dbDriver("PostgreSQL")
         con <- dbConnect(drv, dbname='watermasks', host = hostname, port = 5432, user = "sar2water", password = pw)
         rm(pw)
-        ts <- dbGetQuery(con, paste0("SELECT jrc_neb.id_jrc, ST_area(ST_Transform(jrc_neb.geom,32724)) as ref_area,neb.area, neb.ingestion_time, neb.wmxjrc_area FROM jrc_neb RIGHT JOIN neb ON jrc_neb.id_jrc=neb.id_jrc WHERE ST_Contains(jrc_neb.geom, ST_SetSRID(ST_Point(",click$lng,",",click$lat,"),4326))"))
+        # click = list()
+        # click$lat=-5.3317
+        # click$lng=-40.3075
+        ts <- dbGetQuery(con, paste0("SELECT jrc_neb.id_jrc, ST_area(ST_Transform(jrc_neb.geom,32724)) as ref_area, neb.area, neb.ingestion_time, neb.wmxjrc_area FROM jrc_neb RIGHT JOIN neb ON jrc_neb.id_jrc=neb.id_jrc WHERE ST_Contains(jrc_neb.geom, ST_SetSRID(ST_Point(",click$lng,",",click$lat,"),4326))"))
         dbDisconnect(conn = con)
-        ts <- mutate(ts,ratio=ifelse(area=0,0,wmxjrc_area/area)) %>%
+        ts <- mutate(ts,ratio=ifelse(area==0,0,wmxjrc_area/area)) %>%
           filter(ratio>0.9)
-        
+
         output$plot <- renderPlot({
             ggplot(ts) +
                 geom_point(aes(x=ingestion_time,y=area/10000)) +
