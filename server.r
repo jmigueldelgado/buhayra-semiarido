@@ -42,17 +42,7 @@ function(input, output, session) {
 
         if(nrow(ts) == 0)
         {
-            ts <- mutate(ts,ratio=ifelse(area==0,0,wmxjrc_area/area)) %>%
-              filter(ratio>0.9)
 
-            output$plot <- renderPlot({
-                ggplot(ts) +
-                    geom_point(aes(x=ingestion_time,y=area/10000)) +
-                    scale_y_continuous(limits=c(0,1.1*max(ts$ref_area)/10000)) +
-                    geom_hline(yintercept=ts$ref_area[1]/10000,linetype='dashed',color='orange') +
-                    xlab("Data de Aquisição") +
-                    ylab("Área [ha]")
-            })
             text <- "Açude vazio ou indisponível" #required info
             leafletProxy("mymap") %>%
                 clearPopups() %>%
@@ -60,7 +50,18 @@ function(input, output, session) {
         }
         else
         {
-            text <- paste0("Área do Espelho de Água: ",
+          ts <- mutate(ts,ratio=ifelse(area==0,0,wmxjrc_area/area)) %>%
+            filter(ratio>0.9)
+
+          output$plot <- renderPlot({
+              ggplot(ts) +
+                  geom_point(aes(x=ingestion_time,y=area/10000)) +
+                  scale_y_continuous(limits=c(0,1.1*max(ts$ref_area)/10000)) +
+                  geom_hline(yintercept=ts$ref_area[1]/10000,linetype='dashed',color='orange') +
+                  xlab("Data de Aquisição") +
+                  ylab("Área [ha]")
+          })
+          text <- paste0("Área do Espelho de Água: ",
                            ts %>%
                            filter(ingestion_time == max(ingestion_time)) %>%
                            mutate(area=round(area/10000, digits = 1)) %>%
