@@ -37,21 +37,22 @@ function(input, output, session) {
         # click$lng=-40.3075
         ts <- dbGetQuery(con, paste0("SELECT jrc_neb.id_jrc, ST_area(ST_Transform(jrc_neb.geom,32724)) as ref_area, neb.area, neb.ingestion_time, neb.wmxjrc_area FROM jrc_neb RIGHT JOIN neb ON jrc_neb.id_jrc=neb.id_jrc WHERE ST_Contains(jrc_neb.geom, ST_SetSRID(ST_Point(",click$lng,",",click$lat,"),4326))"))
         dbDisconnect(conn = con)
-        ts <- mutate(ts,ratio=ifelse(area==0,0,wmxjrc_area/area)) %>%
-          filter(ratio>0.9)
 
-        output$plot <- renderPlot({
-            ggplot(ts) +
-                geom_point(aes(x=ingestion_time,y=area/10000)) +
-                scale_y_continuous(limits=c(0,1.1*max(ts$ref_area)/10000)) +
-                geom_hline(yintercept=ts$ref_area[1]/10000,linetype='dashed',color='orange') +
-                xlab("Data de Aquisição") +
-                ylab("Área [ha]")
-        })
 
 
         if(nrow(ts) == 0)
         {
+            ts <- mutate(ts,ratio=ifelse(area==0,0,wmxjrc_area/area)) %>%
+              filter(ratio>0.9)
+
+            output$plot <- renderPlot({
+                ggplot(ts) +
+                    geom_point(aes(x=ingestion_time,y=area/10000)) +
+                    scale_y_continuous(limits=c(0,1.1*max(ts$ref_area)/10000)) +
+                    geom_hline(yintercept=ts$ref_area[1]/10000,linetype='dashed',color='orange') +
+                    xlab("Data de Aquisição") +
+                    ylab("Área [ha]")
+            })
             text <- "Açude vazio ou indisponível" #required info
             leafletProxy("mymap") %>%
                 clearPopups() %>%
