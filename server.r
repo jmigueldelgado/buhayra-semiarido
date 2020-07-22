@@ -11,12 +11,13 @@ function(input, output, session) {
 
     output$mymap <- renderLeaflet({
         activelayers <- filter(wms_layers,id %in% as.numeric(input$datasets)) %>% pull(layer)
+        source("/srv/shiny-server/buhayra-semiarido/pw.R")
 
         leaflet() %>%
             addProviderTiles(providers$OpenStreetMap.Mapnik) %>%
             setView(-36,-5.5, zoom=7) %>%
             addWMSTiles(
-                "http://141.89.96.193/latestwms",
+                paste0("http://",hostname,"/latestwms"),
                 layers = activelayers,
                 options = WMSTileOptions(format = "image/png",
                                          transparent = TRUE,
