@@ -20,3 +20,5 @@ RUN chmod -R 755 /srv/shiny-server && \
   mkdir /srv/shiny-server/buhayra-semiarido
 
 RUN git clone git@github.com:jmigueldelgado/buhayra-semiarido.git /srv/shiny-server/buhayra-semiarido
+
+COPY /home/martinsd/proj/buhayra-semiarido/pw.R /srv/shiny-server/buhayra-semiarido/pw.R
